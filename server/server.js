@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3001;
+const port = 5001;
 const cors = require("cors");
 const http = require("http");
 const predictRouter = require("./clarifai");

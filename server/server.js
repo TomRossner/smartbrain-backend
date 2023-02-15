@@ -10,7 +10,7 @@ const mongoose = require("mongoose");
 
 mongoose.set("strictQuery", false);
 mongoose
-  .connect("mongodb://127.0.0.1:27017/smart-brainDB")
+  .connect('mongodb+srv://tomrossner:QUKBBir12@cluster0.vjajqq9.mongodb.net/ProjectManiaDB?retryWrites=true&w=majority')
   .then(() => console.log("Connected to SmartBrainDB"))
   .catch((err) => console.log(err));
   

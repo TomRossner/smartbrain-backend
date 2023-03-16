@@ -19,7 +19,6 @@ const MODEL_VERSION_ID = '';
 
 metadata.set("authorization", `Key ${PAT}`);
 
-
 const predictImage = (inputs) => {
     return new Promise((resolve, reject) => {
         stub.PostModelOutputs(
@@ -35,15 +34,12 @@ const predictImage = (inputs) => {
             metadata,
             (err, response) => {
                 if (err) {
-                    console.log(err)
                     reject(err);
                 }
         
                 if (response.status.code !== 10000) {
-                    console.log(response)
                     reject("Post model outputs failed, status: " + response.status.description);
                 }
-                console.log(response)
                 
                 let results = [];
                 const output = response.outputs[0];
@@ -60,7 +56,6 @@ function convertURL(url) {
     const bufferedURL = Buffer.from(urlToBuffer, 'base64');
     const convertedToBase64String = bufferedURL.toString('base64');
     return convertedToBase64String;
-    // return url;
 }
 
 predictRouter.post("/", async (req, res) => {

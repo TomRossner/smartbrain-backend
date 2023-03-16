@@ -1,12 +1,15 @@
 const express = require("express");
-const router = express.Router();
-
+const predictRouter = express.Router();
 const {ClarifaiStub, grpc} = require("clarifai-nodejs-grpc");
+require('dotenv').config();
+const Buffer = require("buffer").Buffer;
+const multer = require("multer");
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const stub = ClarifaiStub.grpc();
 const metadata = new grpc.Metadata();
-
-require('dotenv').config();
     
 const USER_ID = process.env.USER_ID;
 const PAT = process.env.API_KEY;
@@ -27,21 +30,24 @@ const predictImage = (inputs) => {
                 },
                 model_id: MODEL_ID,
                 version_id: MODEL_VERSION_ID,
-                inputs: inputs
+                inputs
             },
             metadata,
             (err, response) => {
                 if (err) {
+                    console.log(err)
                     reject(err);
                 }
         
                 if (response.status.code !== 10000) {
+                    console.log(response)
                     reject("Post model outputs failed, status: " + response.status.description);
                 }
+                console.log(response)
                 
                 let results = [];
                 const output = response.outputs[0];
-                const {regions} = output.data;
+                const {regions} = output?.data;
                 results.push(regions);
                 resolve(results);
             }
@@ -49,25 +55,46 @@ const predictImage = (inputs) => {
     })  
 }
 
-router.post("/", async (req, res) => {
+function convertURL(url) {
+    const urlToBuffer = url.split(',')[1];
+    const bufferedURL = Buffer.from(urlToBuffer, 'base64');
+    const convertedToBase64String = bufferedURL.toString('base64');
+    return convertedToBase64String;
+    // return url;
+}
+
+predictRouter.post("/", async (req, res) => {
     try {
-        const {imageURL} = req.body;
-        const inputs = [
+        let {url} = req.body;
+        url = url.substring(0, 5) === "https"
+        ? url
+        : convertURL(url);
+        
+        const HTTPS_inputs = [
             {
                 data: {
                     image: {
-                        url: imageURL
+                        url
+                    }
+                }
+            }
+        ]
+
+        const BASE64_inputs = [
+            {
+                data: {
+                    image: {
+                        base64: url
                     }
                 }
             }
         ];
-        const results = await predictImage(inputs);
-        return res.send({results})
+
+        const results = await predictImage(url.substring(0, 5) === "https" ? HTTPS_inputs : BASE64_inputs);
+        return res.status(200).send({results});
     } catch (error) {
-        return res.status(400).send({
-            error: error
-        })
+        return res.status(400).send({error});
     }
 })
 
-module.exports = router;
+module.exports = predictRouter;

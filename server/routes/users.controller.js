@@ -3,21 +3,20 @@ const {
     checkUserPassword,
     storeUserPassword
 } = require("../bcrypt");
-const {setJwt} = require("../jwt");
 const {createUser, signInUser, signInGoogleUser} = require("../firebase");
 
 
 // Utility functions
 
-const getAllUsers = async () => {
+async function getAllUsers() {
     return await User.find({});
 }
 
-const getUserById = async (id) => {
+async function getUserById(id) {
     return await User.findOne({_id: id});
 }
 
-const getUserByEmail = async (email) => {
+async function getUserByEmail(email) {
     return await User.findOne({email: email});
 }
 
@@ -25,26 +24,24 @@ const getUserByEmail = async (email) => {
 
 // Controller functions
 
-const addNewUser = async (req, res) => {
+async function addNewUser(req, res) {
     try {
         const {name, email, password} = req.body;
         const isUserAlreadyRegistered = await getUserByEmail(email);
-        if (isUserAlreadyRegistered) return res.status(400).send("User already registered");
+        if (isUserAlreadyRegistered) return res.status(400).send({error: "User already registered"});
         else {
-            const newUser = new User({name, email, imgUrl: "", predictions: 0});
-            await newUser.save();
-            const user = await getUserById(newUser._id);
+            const newUser = await new User({name, email, imgUrl: "", predictions: 0}).save();
             storeUserPassword(email, password, 10);
             // createUser(email, password); // From Firebase
-            // setJwt(user._id); // TO BE IMPLEMENTED
-            res.status(200).send(user);
+            res.status(200).send(newUser);
         }
     } catch (error) {
         console.log(error);
+        res.status(400).send({error});
     }
 }
 
-const login = async (req, res) => {
+async function login(req, res) {
     try {
         const {email, password} = req.body;
         const user = await User.findOne({email: email}).select({password: 0, _id: 0});
@@ -52,9 +49,10 @@ const login = async (req, res) => {
         const isPasswordValid = await checkUserPassword(password, userHash.password);
         // signInUser(email, password); // From Firebase
         if (user && isPasswordValid) return res.status(200).send(user);
-        else return res.status(400).send("User not found");
+        else return res.status(400).send({error: "User not found"});
     } catch (error) {
         console.log(error);
+        res.status(400).send({error});
     }
 }
 
@@ -67,7 +65,7 @@ const login = async (req, res) => {
 //     }
 // }
 
-const addPrediction = async (req, res) => {
+async function addPrediction(req, res) {
     try {
         const {id} = req.params;
         const user = await getUserById(id);
@@ -79,10 +77,11 @@ const addPrediction = async (req, res) => {
         return res.status(200).send(updatedUser);
     } catch (error) {
         console.log(error);
+        res.status(400).send({error});
     }
 }
 
-const updateUser = async (req, res) => {
+async function updateUser(req, res) {
     try {
         const {email} = req.params;
         const {predictions, imgUrl} = req.body;
@@ -95,6 +94,7 @@ const updateUser = async (req, res) => {
         res.status(200).send(updatedUser);
     } catch (error) {
         console.log(error);
+        res.status(400).send({error});
     }
 }
 

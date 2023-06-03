@@ -3,10 +3,7 @@ const predictRouter = express.Router();
 const {ClarifaiStub, grpc} = require("clarifai-nodejs-grpc");
 require('dotenv').config();
 const Buffer = require("buffer").Buffer;
-const multer = require("multer");
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
 const stub = ClarifaiStub.grpc();
 const metadata = new grpc.Metadata();
@@ -41,11 +38,15 @@ const predictImage = (inputs) => {
                     reject("Post model outputs failed, status: " + response.status.description);
                 }
                 
-                let results = [];
-                const output = response.outputs[0];
-                const {regions} = output?.data;
-                results.push(regions);
-                resolve(results);
+                try {
+                    let results = [];
+                    const output = response.outputs[0];
+                    const {regions} = output?.data;
+                    results.push(regions);
+                    resolve(results);
+                } catch (error) {
+                    reject(err);
+                }
             }
         );
     })  

@@ -4,9 +4,9 @@ const userSchema = new mongoose.Schema({
     name: {type: String},  
     email: {type: String},  
     password: {type: String},  
-    predictions: {type: Number},
-    created_at: {type: Date, default: Date.now()},
-    imgUrl: {type: String}
+    predictions: {type: Number, default: 0},
+    created_at: {type: Date, default: Date.now},
+    imgUrl: {type: String, default: 0}
 },
 {collection: "users"})
 

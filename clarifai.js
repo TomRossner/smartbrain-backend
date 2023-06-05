@@ -39,13 +39,13 @@ const predictImage = (inputs) => {
                 }
                 
                 try {
-                    let results = [];
+                    const results = [];
                     const output = response.outputs[0];
                     const {regions} = output?.data;
                     results.push(regions);
                     resolve(results);
                 } catch (error) {
-                    reject(err);
+                    reject(error);
                 }
             }
         );

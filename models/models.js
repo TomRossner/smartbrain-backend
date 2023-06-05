@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     password: {type: String},  
     predictions: {type: Number, default: 0},
     created_at: {type: Date, default: Date.now},
-    imgUrl: {type: String, default: 0}
+    imgUrl: {type: String, default: ""}
 },
 {collection: "users"})
 

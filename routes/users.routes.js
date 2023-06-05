@@ -6,8 +6,8 @@ const {
     login,
     updateUser,
     addPrediction,
-    // loginWithGoogle
-} = require("./users.controller");
+    updateProfileImg,
+} = require("../controllers/users.controller");
 
 Router.get('/users', getAllUsers);
 
@@ -15,10 +15,10 @@ Router.post('/users', addNewUser);
 
 Router.post("/login", login);
 
-// Router.post("/google-login", loginWithGoogle);
-
 Router.put("/update-predictions/:id", addPrediction);
 
 Router.put("/update-user/:email", updateUser);
+
+Router.put("/update-profile-img/:email", updateProfileImg);
 
 module.exports = Router;

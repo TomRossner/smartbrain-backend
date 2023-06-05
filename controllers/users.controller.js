@@ -76,14 +76,29 @@ async function addPrediction(req, res) {
 async function updateUser(req, res) {
     try {
         const {email} = req.params;
-        const {predictions, imgUrl} = req.body;
+        const {predictions} = req.body;
         const updatedUser = await User.updateOne({email: email}, {
             $set: {
-                predictions,
+                predictions
+            }
+        })
+        return res.status(200).send(updatedUser);
+    } catch (error) {
+        res.status(400).send({error: 'Failed updating user'});
+    }
+}
+
+async function updateProfileImg(req, res) {
+    try {
+        const {email} = req.params;
+        const {imgUrl} = req.body;
+        
+        const updatedUser = await User.updateOne({email: email}, {
+            $set: {
                 imgUrl
             }
         })
-        res.status(200).send(updatedUser);
+        return res.status(200).send(updatedUser);
     } catch (error) {
         res.status(400).send({error: 'Failed updating user'});
     }
@@ -95,4 +110,5 @@ module.exports = {
     login,
     updateUser,
     addPrediction,
+    updateProfileImg
 }
